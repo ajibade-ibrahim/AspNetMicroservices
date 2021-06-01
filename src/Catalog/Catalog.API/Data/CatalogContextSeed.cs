@@ -8,11 +8,7 @@ namespace Catalog.API.Data
     {
         public static void SeedData(IMongoCollection<Product> productCollection)
         {
-            var oneItemOption = new FindOptions
-            {
-                BatchSize = 1
-            };
-            var hasProducts = productCollection.Find(product => true, oneItemOption).Any();
+            var hasProducts = productCollection.Find(product => true).Any();
 
             if (!hasProducts)
             {
