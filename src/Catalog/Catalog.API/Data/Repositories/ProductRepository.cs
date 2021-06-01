@@ -38,7 +38,7 @@ namespace Catalog.API.Data.Repositories
 
         public async Task<Product> GetProductAsync(string id)
         {
-            return await _context.Products.Find(p => p.Id == id).SingleOrDefaultAsync();
+            return await _context.Products.Find(p => p.Id == id).Limit(1).SingleOrDefaultAsync();
         }
 
         public async Task<IEnumerable<Product>> GetProductByNameAsync(string name)
