@@ -9,6 +9,8 @@ namespace Basket.API
 {
     public class Startup
     {
+        private const string Version1 = "v1";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -30,11 +32,7 @@ namespace Basket.API
 
             app.UseAuthorization();
 
-            app.UseEndpoints(
-                endpoints =>
-                {
-                    endpoints.MapControllers();
-                });
+            app.UseEndpoints(endpoints => endpoints.MapControllers());
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -42,16 +40,13 @@ namespace Basket.API
         {
             services.AddControllers();
             services.AddSwaggerGen(
-                c =>
-                {
-                    c.SwaggerDoc(
-                        "v1",
-                        new OpenApiInfo
-                        {
-                            Title = "Basket.API",
-                            Version = "v1"
-                        });
-                });
+                swaggerGenOptions => swaggerGenOptions.SwaggerDoc(
+                    Version1,
+                    new OpenApiInfo
+                    {
+                        Title = "Basket.API",
+                        Version = Version1
+                    }));
         }
     }
 }
