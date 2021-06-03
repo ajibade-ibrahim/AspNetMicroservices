@@ -40,7 +40,6 @@ namespace Basket.API
             services.AddStackExchangeRedisCache(
                 redisOptions =>
                 {
-                    //redisOptions.Configuration = Configuration.GetValue<string>("CacheSettings:ConnectionString");
                     var cacheSettings = Configuration.GetSection("CacheSettings").Get<CacheSettings>();
                     redisOptions.Configuration = cacheSettings.ConnectionString;
                 });
