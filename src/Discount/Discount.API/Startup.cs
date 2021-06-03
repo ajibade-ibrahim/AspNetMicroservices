@@ -1,3 +1,6 @@
+using Discount.API.Helpers;
+using Discount.API.Repositories;
+using Discount.API.Repositories.Contracts;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -25,7 +28,7 @@ namespace Discount.API
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Discount.API v1"));
+                app.UseSwaggerUI(swaggerUIOptions => swaggerUIOptions.SwaggerEndpoint("/swagger/v1/swagger.json", "Discount.API v1"));
             }
 
             app.UseRouting();
@@ -47,6 +50,9 @@ namespace Discount.API
                         Title = "Discount.API",
                         Version = Version1
                     }));
+
+            services.AddSingleton(_ => Configuration.GetSection("DatabaseSettings").Get<DatabaseSettings>());
+            services.AddScoped<IDiscountRepository, DiscountRepository>();
         }
     }
 }
