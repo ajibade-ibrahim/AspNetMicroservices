@@ -38,8 +38,12 @@ namespace Basket.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddStackExchangeRedisCache(
-                redisOptions => redisOptions.Configuration =
-                    Configuration.GetValue<string>("CacheSettings:ConnectionString"));
+                redisOptions =>
+                {
+                    //redisOptions.Configuration = Configuration.GetValue<string>("CacheSettings:ConnectionString");
+                    var cacheSettings = Configuration.GetSection("CacheSettings").Get<CacheSettings>();
+                    redisOptions.Configuration = cacheSettings.ConnectionString;
+                });
 
             services.AddScoped<IBasketRepository, BasketRepository>();
 
