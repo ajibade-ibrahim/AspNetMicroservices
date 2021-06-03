@@ -35,7 +35,7 @@ namespace Basket.API.Controllers
             catch (Exception exception)
             {
                 LogException(exception);
-                return GetInternalServerError();
+                return GetInternalServerError(exception);
             }
         }
 
@@ -52,7 +52,7 @@ namespace Basket.API.Controllers
             catch (Exception exception)
             {
                 LogException(exception);
-                return GetInternalServerError();
+                return GetInternalServerError(exception);
             }
         }
 
@@ -69,13 +69,13 @@ namespace Basket.API.Controllers
             catch (Exception exception)
             {
                 LogException(exception);
-                return GetInternalServerError();
+                return GetInternalServerError(exception);
             }
         }
 
-        private StatusCodeResult GetInternalServerError()
+        private ObjectResult GetInternalServerError(Exception exception)
         {
-            return StatusCode(StatusCodes.Status500InternalServerError);
+            return StatusCode(StatusCodes.Status500InternalServerError, exception.Message);
         }
 
         private void LogException(Exception exception)
