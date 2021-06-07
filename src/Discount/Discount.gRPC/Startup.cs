@@ -1,6 +1,13 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.Reflection;
+using AutoMapper;
+using Discount.API.Helpers;
+using Discount.API.Repositories;
+using Discount.API.Repositories.Contracts;
+using Discount.gRPC.Services;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -8,6 +15,13 @@ namespace Discount.gRPC
 {
     public class Startup
     {
+        public Startup(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
+        public IConfiguration Configuration { get; }
+
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
@@ -21,7 +35,7 @@ namespace Discount.gRPC
             app.UseEndpoints(
                 endpoints =>
                 {
-                    endpoints.MapGrpcService<GreeterService>();
+                    endpoints.MapGrpcService<DiscountService>();
 
                     endpoints.MapGet(
                         "/",
@@ -37,6 +51,9 @@ namespace Discount.gRPC
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton(_ => Configuration.GetSection("DatabaseSettings").Get<DatabaseSettings>());
+            services.AddAutoMapper(Assembly.GetExecutingAssembly());
+            services.AddScoped<IDiscountRepository, DiscountRepository>();
             services.AddGrpc();
         }
     }
