@@ -27,6 +27,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - "CacheSettings:ConnectionString=basketdb:6379"
+      - "GrpcSettings:DiscountServiceUrl=http://discount.gRPC"
     depends_on:
       - basketdb
     ports:
@@ -47,6 +48,16 @@ services:
       - "DatabaseSettings:ConnectionString=Server=discountdb;Port=5432;Database=Discountdb;User Id=user@domain.com;Password=password1;"
     ports:
       - "8002:80"
+
+  discount.gRPC:
+    container_name: discount.gRPC
+    depends_on:
+      - discountdb
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - "DatabaseSettings:ConnectionString=Server=discountdb;Port=5432;Database=Discountdb;User Id=user@domain.com;Password=password1;"
+    ports:
+      - "8003:80"
 
   discountdb:
     container_name: discountdb
