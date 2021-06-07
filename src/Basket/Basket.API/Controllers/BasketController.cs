@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Basket.API.Entities;
 using Basket.API.Repositories.Contracts;
+using Basket.API.Services.Contracts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -12,14 +13,36 @@ namespace Basket.API.Controllers
     [ApiController]
     public class BasketController : ControllerBase
     {
-        public BasketController(IBasketRepository basketRepository, ILogger<BasketController> logger)
+        public BasketController(
+            IBasketRepository basketRepository,
+            ILogger<BasketController> logger,
+            IDiscountService discountService)
         {
             _basketRepository = basketRepository;
             _logger = logger;
+            _discountService = discountService;
         }
 
         private readonly IBasketRepository _basketRepository;
+        private readonly IDiscountService _discountService;
         private readonly ILogger<BasketController> _logger;
+
+        [HttpDelete("{userName}", Name = "DeleteBasket")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesDefaultResponseType]
+        public async Task<IActionResult> DeleteBasket(string username)
+        {
+            try
+            {
+                await _basketRepository.DeleteBasket(username);
+                return NoContent();
+            }
+            catch (Exception exception)
+            {
+                LogException(exception);
+                return GetInternalServerError(exception);
+            }
+        }
 
         [HttpGet("{userName}", Name = "GetBasket")]
         [ProducesResponseType(typeof(ShoppingCart), StatusCodes.Status200OK)]
@@ -47,24 +70,13 @@ namespace Basket.API.Controllers
         {
             try
             {
-                return Ok(await _basketRepository.UpdateBasket(cart));
-            }
-            catch (Exception exception)
-            {
-                LogException(exception);
-                return GetInternalServerError(exception);
-            }
-        }
+                foreach (var item in cart.Items)
+                {
+                    var coupon = await _discountService.GetDiscount(item.ProductName);
+                    item.Price -= coupon.Amount;
+                }
 
-        [HttpDelete("{userName}", Name = "DeleteBasket")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesDefaultResponseType]
-        public async Task<IActionResult> DeleteBasket(string username)
-        {
-            try
-            {
-                await _basketRepository.DeleteBasket(username);
-                return NoContent();
+                return Ok(cart);
             }
             catch (Exception exception)
             {
